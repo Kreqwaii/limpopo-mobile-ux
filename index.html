@@ -1,0 +1,3106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Аквапарк Лимпопо | Инженерный стенд мобильной адаптации 1С-Битрикс</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230284C7'/%3E%3Cpath d='M6 19.5c2.2-1.8 4.4-1.8 6.6 0s4.4 1.8 6.6 0 4.4-1.8 6.8 0' fill='none' stroke='%23FFFFFF' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M6 13.5c2.2-1.8 4.4-1.8 6.6 0s4.4 1.8 6.6 0 4.4-1.8 6.8 0' fill='none' stroke='%23FDE68A' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F6F8FA;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #EFF4F8;
+      --bg-muted: #E6EDF3;
+      --border-subtle: rgba(15, 23, 42, 0.08);
+      --border-strong: rgba(15, 23, 42, 0.16);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --accent-water: #0284C7;
+      --accent-water-hover: #0369A1;
+      --accent-water-soft: rgba(2, 132, 199, 0.09);
+      --accent-water-border: rgba(2, 132, 199, 0.28);
+      --accent-ticket: #D97706;
+      --accent-ticket-hover: #B45309;
+      --accent-ticket-soft: rgba(217, 119, 6, 0.10);
+      --accent-ticket-border: rgba(217, 119, 6, 0.30);
+      --status-ok: #059669;
+      --status-ok-soft: rgba(5, 150, 105, 0.10);
+      --status-danger: #DC2626;
+      --status-danger-soft: rgba(220, 38, 38, 0.09);
+      --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select {
+      font-family: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    a:focus-visible {
+      outline: 2px solid var(--accent-water);
+      outline-offset: 2px;
+    }
+
+    .num {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Top Engineering Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .topbar-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background-color: var(--accent-water);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #FFFFFF;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .meta-sep {
+      color: var(--border-strong);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .budget-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .budget-pill strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .pilot-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background-color: var(--accent-ticket-soft);
+      border: 1px solid var(--accent-ticket-border);
+      color: #92400E;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Main Tabs Navigation */
+    .tabs-bar {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tabs-bar-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 6px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tab-list {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background-color: var(--bg-subtle);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background-color: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.14s var(--ease-out), color 0.14s var(--ease-out), border-color 0.14s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background-color: rgba(255, 255, 255, 0.65);
+    }
+
+    .tab-btn:active {
+      transform: scale(0.97);
+    }
+
+    .tab-btn.is-active {
+      background-color: var(--bg-surface);
+      color: var(--accent-water);
+      border-color: var(--border-subtle);
+      font-weight: 600;
+    }
+
+    .env-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .env-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    /* Main Container */
+    .workspace {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 24px 24px;
+    }
+
+    .tab-panel {
+      display: none;
+      opacity: 0;
+      transform: translateY(4px);
+    }
+
+    .tab-panel.is-active {
+      display: block;
+      animation: panelEnter 0.18s var(--ease-out) forwards;
+    }
+
+    @keyframes panelEnter {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Shared Surface Panels */
+    .panel {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .panel-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 2px 0 0;
+    }
+
+    .section-heading {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 20px 0 8px;
+    }
+
+    .section-heading:first-child {
+      margin-top: 0;
+    }
+
+    /* Badges & Segmented Controls */
+    .seg-group {
+      display: inline-flex;
+      padding: 4px;
+      gap: 4px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+
+    .seg-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 32px;
+      padding: 4px 12px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background-color: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      transition: background-color 0.12s var(--ease-out), color 0.12s var(--ease-out), border-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .seg-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .seg-btn:active {
+      transform: scale(0.97);
+    }
+
+    .seg-btn.is-active {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+      font-weight: 600;
+    }
+
+    .seg-btn.is-active-water {
+      background-color: var(--accent-water);
+      color: #FFFFFF;
+      border-color: var(--accent-water);
+      font-weight: 500;
+    }
+
+    .seg-btn.is-active-danger {
+      background-color: var(--status-danger);
+      color: #FFFFFF;
+      border-color: var(--status-danger);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .badge-ok {
+      background-color: var(--status-ok-soft);
+      color: #065F46;
+    }
+
+    .badge-danger {
+      background-color: var(--status-danger-soft);
+      color: #991B1B;
+    }
+
+    .badge-warn {
+      background-color: var(--accent-ticket-soft);
+      color: #92400E;
+    }
+
+    .badge-info {
+      background-color: var(--accent-water-soft);
+      color: #075985;
+    }
+
+    /* TAB 1: Workbench Layout */
+    .workbench-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .workbench-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .workbench-grid {
+      display: grid;
+      grid-template-columns: minmax(360px, auto) minmax(360px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Device Frame */
+    .device-stage {
+      min-width: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .device-meta-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .device-chassis {
+      width: 390px;
+      max-width: 100%;
+      background-color: #1E293B;
+      border-radius: 28px;
+      padding: 10px;
+      box-shadow: 0 18px 36px -12px rgba(15, 23, 42, 0.18);
+      transition: width 0.2s var(--ease-out);
+    }
+
+    .device-chassis.size-360 {
+      width: 360px;
+    }
+
+    .device-chassis.size-390 {
+      width: 390px;
+    }
+
+    .device-screen {
+      position: relative;
+      height: 616px;
+      background-color: #F6F8FA;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .device-statusbar {
+      height: 28px;
+      padding: 0 16px;
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .device-browser-bar {
+      padding: 6px 12px;
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .url-box {
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--bg-subtle);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .device-viewport {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+      background-color: #F6F8FA;
+    }
+
+    .device-viewport.has-overflow-bug {
+      overflow-x: auto;
+    }
+
+    /* Mobile App Views Inside Phone */
+    .mob-view {
+      display: none;
+      padding-bottom: 84px;
+    }
+
+    .mob-view.is-active {
+      display: block;
+    }
+
+    /* NEW MOBILE VIEW */
+    .mob-header {
+      background-color: #FFFFFF;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mob-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mob-logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background-color: var(--accent-water);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mob-logo-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .mob-logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .mob-tel-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 36px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .mob-section {
+      padding: 12px 16px 0;
+    }
+
+    .mob-day-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 4px;
+      background-color: var(--bg-muted);
+      border-radius: 10px;
+    }
+
+    .mob-day-btn {
+      min-height: 44px;
+      border: none;
+      border-radius: 6px;
+      background-color: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.2;
+      transition: background-color 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-day-btn:active {
+      transform: scale(0.97);
+    }
+
+    .mob-day-btn.is-active {
+      background-color: #FFFFFF;
+      color: var(--accent-water);
+      font-weight: 600;
+    }
+
+    .mob-day-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 400;
+      margin-top: 2px;
+    }
+
+    .mob-day-btn.is-active .mob-day-sub {
+      color: var(--text-secondary);
+    }
+
+    .mob-format-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .mob-format-btn {
+      min-height: 44px;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: #FFFFFF;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.12s var(--ease-out), border-color 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-format-btn:active {
+      transform: scale(0.97);
+    }
+
+    .mob-format-btn.is-active {
+      background-color: var(--accent-water-soft);
+      border-color: var(--accent-water);
+      color: var(--accent-water);
+      font-weight: 600;
+    }
+
+    .mob-presets-scroll {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 0 2px;
+    }
+
+    .mob-preset-chip {
+      min-height: 32px;
+      padding: 4px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: #FFFFFF;
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color 0.12s var(--ease-out), border-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-preset-chip:hover {
+      border-color: var(--accent-water);
+    }
+
+    .mob-preset-chip:active {
+      transform: scale(0.97);
+    }
+
+    .mob-ticket-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mob-ticket-card {
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .mob-ticket-card.is-selected {
+      border-color: var(--accent-water-border);
+    }
+
+    .mob-ticket-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mob-ticket-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .mob-ticket-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    .mob-ticket-price {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-water);
+      margin-top: 4px;
+    }
+
+    .stepper {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+
+    .stepper-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      background-color: #FFFFFF;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .stepper-btn:hover:not(:disabled) {
+      background-color: var(--bg-muted);
+    }
+
+    .stepper-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .stepper-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .stepper-btn.is-plus {
+      background-color: var(--accent-water);
+      color: #FFFFFF;
+    }
+
+    .stepper-btn.is-plus:hover {
+      background-color: var(--accent-water-hover);
+    }
+
+    .stepper-val {
+      min-width: 24px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Addon & Promo inside phone */
+    .mob-addon-card {
+      margin-top: 10px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .mob-addon-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .mob-cabin-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .mob-cabin-btn {
+      min-height: 44px;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      text-align: center;
+      transition: background-color 0.12s var(--ease-out), border-color 0.12s var(--ease-out), color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-cabin-btn:active {
+      transform: scale(0.97);
+    }
+
+    .mob-cabin-btn.is-active {
+      background-color: var(--accent-ticket-soft);
+      border-color: var(--accent-ticket);
+      color: #92400E;
+      font-weight: 600;
+    }
+
+    .mob-promo-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mob-input {
+      flex: 1;
+      min-height: 44px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background-color: #FFFFFF;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .mob-promo-apply {
+      min-height: 44px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-promo-apply:hover {
+      background-color: var(--bg-muted);
+    }
+
+    .mob-promo-apply:active {
+      transform: scale(0.97);
+    }
+
+    .mob-promo-msg {
+      margin-top: 6px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .mob-promo-msg.is-ok {
+      color: var(--status-ok);
+    }
+
+    .mob-promo-msg.is-err {
+      color: var(--status-danger);
+    }
+
+    .mob-zones-strip {
+      margin-top: 10px;
+      background-color: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .mob-zones-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .mob-zone-tag {
+      padding: 4px 8px;
+      border-radius: 6px;
+      background-color: var(--bg-subtle);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    /* Sticky Bottom Bar inside phone */
+    .mob-sticky-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #FFFFFF;
+      border-top: 1px solid var(--border-strong);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .mob-sticky-sum {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .mob-sticky-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
+    .mob-sticky-price {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.25;
+    }
+
+    .mob-checkout-btn {
+      min-height: 44px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--accent-ticket);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .mob-checkout-btn:hover:not(:disabled) {
+      background-color: var(--accent-ticket-hover);
+    }
+
+    .mob-checkout-btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .mob-checkout-btn:disabled {
+      background-color: var(--bg-muted);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .mob-empty-state {
+      margin-top: 10px;
+      padding: 16px 12px;
+      background-color: #FFFFFF;
+      border: 1px dashed var(--border-strong);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .mob-empty-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .mob-empty-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 4px 0 10px;
+    }
+
+    .mob-reset-btn {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-water-border);
+      background-color: var(--accent-water-soft);
+      color: var(--accent-water);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Checkout Drawer inside Phone */
+    .mob-sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: flex-end;
+      z-index: 25;
+    }
+
+    .mob-sheet-backdrop.is-open {
+      display: flex;
+    }
+
+    .mob-sheet {
+      width: 100%;
+      background-color: #FFFFFF;
+      border-radius: 16px 16px 0 0;
+      padding: 16px;
+      border-top: 1px solid var(--border-subtle);
+      animation: sheetUp 0.18s var(--ease-out);
+    }
+
+    @keyframes sheetUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .mob-sheet-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .mob-sheet-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .mob-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mob-pay-methods {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin: 10px 0 12px;
+    }
+
+    .mob-pay-btn {
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .mob-pay-btn.is-active {
+      background-color: var(--accent-water-soft);
+      border-color: var(--accent-water);
+      color: var(--accent-water);
+    }
+
+    .mob-receipt-box {
+      padding: 12px;
+      border-radius: 10px;
+      background-color: var(--status-ok-soft);
+      border: 1px solid rgba(5, 150, 105, 0.25);
+      color: #065F46;
+      font-size: 12px;
+    }
+
+    /* LEGACY BITRIX VIEW INSIDE PHONE */
+    .legacy-banner {
+      background-color: #DC2626;
+      color: #FFFFFF;
+      padding: 8px 12px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .legacy-header {
+      background-color: #FFFFFF;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .legacy-nav-pile {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .legacy-nav-link {
+      padding: 3px 6px;
+      background-color: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      font-size: 10px;
+      color: #334155;
+      border-radius: 3px;
+    }
+
+    .legacy-hero-svg-block {
+      margin: 10px;
+      padding: 12px;
+      background-color: #E2E8F0;
+      border-radius: 6px;
+      border: 1px dashed #94A3B8;
+      font-size: 11px;
+      color: #334155;
+    }
+
+    .legacy-table-wrap {
+      margin: 10px;
+      background-color: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      padding: 8px;
+    }
+
+    .legacy-wide-table {
+      width: 640px;
+      border-collapse: collapse;
+      font-size: 10px;
+      color: #334155;
+    }
+
+    .legacy-wide-table th,
+    .legacy-wide-table td {
+      border: 1px solid #CBD5E1;
+      padding: 4px 6px;
+      text-align: left;
+    }
+
+    .legacy-wide-table th {
+      background-color: #F1F5F9;
+      font-weight: 600;
+    }
+
+    .legacy-form-box {
+      margin: 10px;
+      padding: 10px;
+      background-color: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      font-size: 11px;
+    }
+
+    .legacy-form-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .legacy-tiny-select {
+      font-size: 11px;
+      padding: 3px;
+      border: 1px solid #94A3B8;
+      width: 64px;
+    }
+
+    .legacy-jivo-float {
+      position: absolute;
+      right: 10px;
+      bottom: 12px;
+      padding: 8px 10px;
+      border-radius: 20px;
+      background-color: #16A34A;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      z-index: 12;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Right Telemetry Panel */
+    .telemetry-stack {
+      min-width: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .kpi-box {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .kpi-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .kpi-val {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .kpi-val.is-ok {
+      color: var(--status-ok);
+    }
+
+    .kpi-val.is-bad {
+      color: var(--status-danger);
+    }
+
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .qa-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .qa-btn {
+      min-height: 40px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background-color 0.12s var(--ease-out), border-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .qa-btn .mono {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: 11px;
+      color: var(--accent-water);
+    }
+
+    .qa-btn:hover {
+      background-color: var(--bg-surface);
+      border-color: var(--accent-water-border);
+    }
+
+    .qa-btn:active {
+      transform: scale(0.97);
+    }
+
+    .audit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .audit-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface);
+    }
+
+    .audit-row-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .audit-row-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* TAB 2: Bitrix Map & CWV */
+    .cwv-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .cwv-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .cwv-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .cwv-compare {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .cwv-before {
+      font-size: 13px;
+      color: var(--status-danger);
+      text-decoration: line-through;
+    }
+
+    .cwv-after {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--status-ok);
+    }
+
+    .cwv-delta {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 760px;
+      background-color: var(--bg-surface);
+    }
+
+    .data-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background-color: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .data-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: top;
+      color: var(--text-primary);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .deploy-steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .deploy-step {
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .deploy-step-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-water);
+      margin-bottom: 6px;
+    }
+
+    .deploy-step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .deploy-step-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* TAB 3: Scope & Estimate */
+    .estimate-layout {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .pilot-box {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--accent-ticket-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .pilot-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pilot-price {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--accent-ticket);
+    }
+
+    .module-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface);
+      margin-bottom: 8px;
+      transition: border-color 0.12s var(--ease-out), background-color 0.12s var(--ease-out);
+    }
+
+    .module-row.is-checked {
+      border-color: var(--accent-water-border);
+      background-color: rgba(2, 132, 199, 0.03);
+    }
+
+    .module-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .module-checkbox {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent-water);
+      cursor: pointer;
+    }
+
+    .module-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .module-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .module-cost {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .module-cost-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .module-cost-days {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .summary-card {
+      position: sticky;
+      top: 76px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .summary-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 13px;
+    }
+
+    .summary-total-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background-color: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .summary-total-val {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    .budget-bar-track {
+      height: 8px;
+      border-radius: 9999px;
+      background-color: var(--bg-muted);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .budget-bar-fill {
+      height: 100%;
+      background-color: var(--accent-water);
+      border-radius: 9999px;
+      transition: transform 0.2s var(--ease-out);
+      transform-origin: left center;
+    }
+
+    .primary-action-btn {
+      width: 100%;
+      min-height: 40px;
+      margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background-color: var(--accent-water);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    }
+
+    .primary-action-btn:hover {
+      background-color: var(--accent-water-hover);
+    }
+
+    .primary-action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .copy-feedback {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--status-ok);
+      min-height: 18px;
+    }
+
+    @media (max-width: 1080px) {
+      .workbench-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .qa-actions-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .cwv-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .deploy-steps {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .estimate-layout {
+        grid-template-columns: 1fr;
+      }
+      .summary-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        position: static;
+      }
+      .topbar-inner,
+      .tabs-bar-inner,
+      .workspace {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      .tab-list {
+        flex-wrap: wrap;
+      }
+      .tab-btn {
+        flex: 1 1 auto;
+        justify-content: flex-start;
+      }
+      .qa-actions-grid,
+      .cwv-grid,
+      .deploy-steps {
+        grid-template-columns: 1fr;
+      }
+      .device-stage {
+        padding: 10px;
+      }
+      .device-chassis,
+      .device-chassis.size-390,
+      .device-chassis.size-360 {
+        width: 100%;
+        padding: 6px;
+        border-radius: 20px;
+      }
+      .device-screen {
+        height: 580px;
+        border-radius: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px;">
+            <path d="M3 16c2.2-1.8 4.4-1.8 6.6 0s4.4 1.8 6.6 0 4.4-1.8 4.8 0"></path>
+            <path d="M3 10c2.2-1.8 4.4-1.8 6.6 0s4.4 1.8 6.6 0 4.4-1.8 4.8 0"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Аквапарк «Лимпопо»: Инженерный стенд мобильной адаптации</h1>
+          <div class="brand-meta">
+            <span>Екатеринбург, ул. Щербакова, д. 2</span>
+            <span class="meta-sep">|</span>
+            <span>Mallino Development Group / ООО «КИТ Екатеринбург»</span>
+            <span class="meta-sep">|</span>
+            <span class="mono">1С-Битрикс /local/templates/main/</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="budget-pill">
+          <span>Тендерный бюджет:</span>
+          <strong class="num">800 000 - 3 000 000 ₽</strong>
+        </div>
+        <div class="pilot-tag num">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+          <span>Пилотный этап 1: 4 900 ₽ / 48 ч</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs-bar" aria-label="Разделы инженерного стенда">
+    <div class="tabs-bar-inner">
+      <div class="tab-list" role="tablist">
+        <button class="tab-btn is-active" type="button" role="tab" aria-selected="true" data-tab="tab-sim">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>1. Симулятор смартфона и покупка билетов</span>
+        </button>
+        <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="tab-bitrix">
+          <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>2. Карта 1С-Битрикс и Core Web Vitals</span>
+        </button>
+        <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="tab-plan">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+          <span>3. Поэтапный план работ и смета</span>
+        </button>
+      </div>
+
+      <div class="env-status">
+        <span>Аудит: <strong class="mono">https://limpopo-park.ru</strong></span>
+        <span class="env-chip">HTML главной: 583 КБ</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="workspace">
+
+    <!-- TAB 1: INTERACTIVE MOBILE SIMULATOR -->
+    <section id="tab-sim" class="tab-panel is-active" role="tabpanel">
+      <div class="workbench-toolbar">
+        <div class="workbench-controls">
+          <div class="seg-group" aria-label="Разрешение экрана смартфона">
+            <button class="seg-btn is-active num" type="button" data-size="390">390 x 844 (iOS)</button>
+            <button class="seg-btn num" type="button" data-size="360">360 x 800 (Android)</button>
+          </div>
+          <div class="seg-group" aria-label="Режим отображения">
+            <button class="seg-btn is-active-water" type="button" data-mode="new">Новая мобильная верстка</button>
+            <button class="seg-btn" type="button" data-mode="legacy">Текущий шаблон 1С-Битрикс</button>
+          </div>
+        </div>
+        <div class="env-status">
+          <span class="status-badge badge-info" id="sim-status-badge">Режим: Новая верстка 2-tap checkout</span>
+        </div>
+      </div>
+
+      <div class="workbench-grid">
+        <!-- Phone Mockup -->
+        <div class="device-stage">
+          <div class="device-meta-bar">
+            <span class="mono" id="device-res-label">Viewport: 390 x 844 px</span>
+            <span class="num" id="device-scroll-label">Тач-таргеты: min 44 x 44 px</span>
+          </div>
+
+          <div class="device-chassis size-390" id="device-chassis">
+            <div class="device-screen">
+              <div class="device-statusbar">
+                <span class="num">10:42</span>
+                <span class="mono">4G | 88%</span>
+              </div>
+              <div class="device-browser-bar">
+                <div class="url-box" id="device-url-box">limpopo-park.ru/order/?template=limpopo_mobile_2026</div>
+                <span class="status-badge badge-ok" id="device-zoom-badge">Zoom OK</span>
+              </div>
+
+              <div class="device-viewport" id="device-viewport">
+                <!-- NEW MOBILE VERSION -->
+                <div class="mob-view is-active" id="mob-view-new">
+                  <div class="mob-header">
+                    <div class="mob-logo">
+                      <div class="mob-logo-icon" aria-hidden="true">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M3 15c2.2-1.5 4.4-1.5 6.6 0s4.4 1.5 6.6 0 4.4-1.5 4.8 0"/><path d="M3 10c2.2-1.5 4.4-1.5 6.6 0s4.4 1.5 6.6 0 4.4-1.5 4.8 0"/></svg>
+                      </div>
+                      <div>
+                        <div class="mob-logo-text">Аквапарк Лимпопо</div>
+                        <div class="mob-logo-sub num">Щербакова, 2 | 10:00 - 22:00</div>
+                      </div>
+                    </div>
+                    <a class="mob-tel-btn num" href="tel:+73433639093">
+                      <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                      <span>363-90-93</span>
+                    </a>
+                  </div>
+
+                  <div class="mob-section">
+                    <div class="mob-day-switch" role="group" aria-label="День посещения">
+                      <button class="mob-day-btn is-active" type="button" data-day="weekday">
+                        <span>Будние дни</span>
+                        <span class="mob-day-sub">ПН - ПТ</span>
+                      </button>
+                      <button class="mob-day-btn" type="button" data-day="weekend">
+                        <span>Выходные и праздники</span>
+                        <span class="mob-day-sub">СБ - ВС, каникулы</span>
+                      </button>
+                    </div>
+
+                    <div class="mob-format-row" role="group" aria-label="Длительность тарифа">
+                      <button class="mob-format-btn is-active num" type="button" data-duration="3h">3 часа</button>
+                      <button class="mob-format-btn" type="button" data-duration="full">Весь день</button>
+                      <button class="mob-format-btn num" type="button" data-duration="pool">Бассейн 06-23</button>
+                    </div>
+
+                    <div class="mob-presets-scroll">
+                      <button class="mob-preset-chip" type="button" data-preset="family">Семья 2+1</button>
+                      <button class="mob-preset-chip" type="button" data-preset="couple">Пара (2 взр)</button>
+                      <button class="mob-preset-chip" type="button" data-preset="birthday">Д/Р -300 ₽</button>
+                      <button class="mob-preset-chip" type="button" data-preset="clear">Сброс</button>
+                    </div>
+
+                    <div class="mob-ticket-list" id="mob-ticket-list"></div>
+
+                    <div class="mob-empty-state" id="mob-empty-state" style="display:none;">
+                      <div class="mob-empty-title">Билеты не выбраны</div>
+                      <div class="mob-empty-sub">Добавьте хотя бы один билет или выберите семейный набор</div>
+                      <button class="mob-reset-btn" type="button" id="mob-empty-preset-btn">Выбрать набор 2 взр + 1 дет</button>
+                    </div>
+
+                    <div class="mob-addon-card">
+                      <div class="mob-addon-title">Каюта отдыха / Депозит</div>
+                      <div class="mob-cabin-row" role="group" aria-label="Выбор каюты">
+                        <button class="mob-cabin-btn is-active" type="button" data-cabin="0">Без каюты</button>
+                        <button class="mob-cabin-btn num" type="button" data-cabin="1000">Каюта +1 000 ₽</button>
+                        <button class="mob-cabin-btn num" type="button" data-cabin="3000">Люкс +3 000 ₽</button>
+                      </div>
+                    </div>
+
+                    <div class="mob-addon-card">
+                      <div class="mob-addon-title">Промокод или скидка именинника</div>
+                      <div class="mob-promo-row">
+                        <input class="mob-input mono" id="mob-promo-input" name="promo_code" type="text" autocomplete="off" placeholder="DR300 или LIMPOPO10" aria-label="Промокод">
+                        <button class="mob-promo-apply" type="button" id="mob-promo-btn">Применить</button>
+                      </div>
+                      <div class="mob-promo-msg" id="mob-promo-msg">Доступные коды: DR300 (-300 ₽/билет), LIMPOPO10 (-10%)</div>
+                    </div>
+
+                    <div class="mob-zones-strip">
+                      <div class="mob-addon-title">Зоны и горки по тарифу (<span id="mob-zone-label">Аквапарк + Банный комплекс</span>)</div>
+                      <div class="mob-zones-tags" id="mob-zones-tags"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- LEGACY BITRIX VIEW -->
+                <div class="mob-view" id="mob-view-legacy">
+                  <div class="legacy-banner num">
+                    Текущий /local/templates/main/: HTML 583 КБ | user-scalable=no | горизонтальный скролл таблицы
+                  </div>
+                  <div class="legacy-header">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                      <strong style="font-size:13px;">Лимпопо | Екатеринбург</strong>
+                      <span style="font-size:11px;color:#64748B;">Меню (18 пунктов)</span>
+                    </div>
+                    <div class="legacy-nav-pile">
+                      <span class="legacy-nav-link">Аквазона</span>
+                      <span class="legacy-nav-link">Цены</span>
+                      <span class="legacy-nav-link">Акции</span>
+                      <span class="legacy-nav-link">Бассейн</span>
+                      <span class="legacy-nav-link">Банный комплекс</span>
+                      <span class="legacy-nav-link">Кафе</span>
+                      <span class="legacy-nav-link">Правила</span>
+                    </div>
+                  </div>
+
+                  <div class="legacy-hero-svg-block">
+                    <strong>Дефект 1: Тяжелый первый экран</strong>
+                    <div style="margin-top:4px;">20+ инлайн-SVG анимаций (/images/animation/), GSAP 71 КБ и слайдер Swiper 142 КБ выталкивают тарифы ниже 820 px.</div>
+                  </div>
+
+                  <div class="legacy-table-wrap">
+                    <div style="font-size:11px;font-weight:600;margin-bottom:6px;color:#DC2626;">Дефект 2: Таблица прайса 640 px без адаптива (прокрутите вправо)</div>
+                    <table class="legacy-wide-table num">
+                      <thead>
+                        <tr>
+                          <th>Категория гостя</th>
+                          <th>3 часа Будни</th>
+                          <th>3 часа Выходные</th>
+                          <th>Весь день Будни</th>
+                          <th>Весь день Вых.</th>
+                          <th>Именинник</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Взрослый (от 146 см)</td>
+                          <td>2 550 ₽</td>
+                          <td>2 950 ₽</td>
+                          <td>3 300 ₽</td>
+                          <td>3 600 ₽</td>
+                          <td>-300 ₽</td>
+                        </tr>
+                        <tr>
+                          <td>Детский (100 - 146 см)</td>
+                          <td>2 200 ₽</td>
+                          <td>2 550 ₽</td>
+                          <td>2 950 ₽</td>
+                          <td>3 300 ₽</td>
+                          <td>-300 ₽</td>
+                        </tr>
+                        <tr>
+                          <td>Льготный / Социальный</td>
+                          <td>1 900 ₽</td>
+                          <td>2 200 ₽</td>
+                          <td>2 500 ₽</td>
+                          <td>2 800 ₽</td>
+                          <td>По документу</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="legacy-form-box">
+                    <div style="font-weight:600;color:#DC2626;margin-bottom:6px;">Дефект 3: Форма /order/ без sticky-чекаута</div>
+                    <div class="legacy-form-row">
+                      <span>Взрослый 3 часа (2 550 ₽)</span>
+                      <select id="legacy-select-adult" name="legacy_adult" class="legacy-tiny-select" aria-label="Старый селект взрослый">
+                        <option>0</option><option>1</option><option selected>2</option>
+                      </select>
+                    </div>
+                    <div class="legacy-form-row">
+                      <span>Детский 3 часа (2 200 ₽)</span>
+                      <select id="legacy-select-child" name="legacy_child" class="legacy-tiny-select" aria-label="Старый селект детский">
+                        <option>0</option><option selected>1</option><option>2</option>
+                      </select>
+                    </div>
+                    <div style="margin-top:10px;color:#475569;font-size:11px;">
+                      Нет липкого нижнего бара с итоговой суммой. Кнопка «Перейти к оплате» находится ниже SmartCaptcha и оферты.
+                    </div>
+                    <div style="margin-top:12px;padding:8px;background:#F1F5F9;border:1px solid #CBD5E1;text-align:center;">
+                      Yandex SmartCaptcha + Чекбокс оферты (14 px)
+                    </div>
+                    <button type="button" style="width:100%;margin-top:10px;padding:8px;background:#64748B;color:#fff;border:none;font-size:12px;">
+                      Оформить заказ (внизу формы)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sticky Checkout Bar (only in New mode) -->
+              <div class="mob-sticky-bar" id="mob-sticky-bar">
+                <div class="mob-sticky-sum">
+                  <span class="mob-sticky-label num" id="mob-sticky-count">3 билета | Будни, 3 часа</span>
+                  <span class="mob-sticky-price num" id="mob-sticky-total">7 300 ₽</span>
+                </div>
+                <button class="mob-checkout-btn" type="button" id="mob-open-checkout">Купить в 2 тапа</button>
+              </div>
+
+              <!-- Legacy floating Jivo button (only in Legacy mode) -->
+              <div class="legacy-jivo-float" id="legacy-jivo-float" style="display:none;">
+                Чат JivoSite (перекрывает край)
+              </div>
+
+              <!-- 2-Tap Bottom Sheet Checkout -->
+              <div class="mob-sheet-backdrop" id="mob-sheet-backdrop" role="dialog" aria-modal="true" aria-labelledby="mob-sheet-title">
+                <div class="mob-sheet">
+                  <div class="mob-sheet-head">
+                    <h2 class="mob-sheet-title" id="mob-sheet-title">Шаг 2: Оплата и получение QR-билетов</h2>
+                    <button class="mob-close-btn" type="button" id="mob-close-sheet" aria-label="Закрыть окно оплаты">
+                      <svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+
+                  <div id="mob-sheet-form-body">
+                    <div class="num" style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;" id="mob-sheet-summary">
+                      К оплате: 7 300 ₽
+                    </div>
+                    <input class="mob-input" id="mob-email-input" name="ticket_email" type="email" autocomplete="email" value="guest@ekb-example.ru" placeholder="E-mail для отправки QR-билетов" aria-label="Email для билетов" style="width:100%;">
+                    <div class="mob-pay-methods" role="group" aria-label="Способ оплаты">
+                      <button class="mob-pay-btn is-active" type="button" data-pay="sbp">СБП (QR)</button>
+                      <button class="mob-pay-btn" type="button" data-pay="mir">Карта Мир</button>
+                      <button class="mob-pay-btn" type="button" data-pay="sber">SberPay</button>
+                    </div>
+                    <button class="mob-checkout-btn" type="button" id="mob-confirm-pay" style="width:100%;">
+                      Оплатить билеты
+                    </button>
+                  </div>
+
+                  <div id="mob-sheet-receipt" class="mob-receipt-box" style="display:none;">
+                    <div style="font-weight:600;margin-bottom:4px;">Заказ оформлен через /order/</div>
+                    <div class="num" id="mob-receipt-details">Номер билета #LP-2026-4819.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Engineering Inspector -->
+        <div class="telemetry-stack">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Телеметрия мобильной воронки</h2>
+                <p class="panel-subtitle">Сравнение параметров экрана <span class="mono" id="tel-viewport-txt">390 x 844 px</span> и пути покупки билета</p>
+              </div>
+              <span class="status-badge badge-ok" id="tel-mode-badge">Оптимизированный шаблон</span>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-box">
+                <div class="kpi-label">Тапы до окна оплаты</div>
+                <div class="kpi-val num is-ok" id="tel-taps">2 тапа</div>
+                <div class="kpi-sub" id="tel-taps-sub">Выбор тарифа + кнопка sticky bar</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Высота до первой цены</div>
+                <div class="kpi-val num is-ok" id="tel-scroll">168 px</div>
+                <div class="kpi-sub" id="tel-scroll-sub">Без пролистывания слайдера</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Горизонтальный overflow</div>
+                <div class="kpi-val num is-ok" id="tel-overflow">0 px</div>
+                <div class="kpi-sub" id="tel-overflow-sub">Строгая адаптивная сетка</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Мин. размер зоны клика</div>
+                <div class="kpi-val num is-ok" id="tel-touch">44 x 44 px</div>
+                <div class="kpi-sub" id="tel-touch-sub">Соответствует WCAG / iOS HIG</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Быстрые сценарии проверки стенда</h2>
+                <p class="panel-subtitle">Автоматически заполняют симулятор смартфона для демонстрации тендерной комиссии</p>
+              </div>
+            </div>
+            <div class="qa-actions-grid">
+              <button class="qa-btn" type="button" id="qa-family-weekend">
+                <span>Семья 2+1 на выходные (3 часа)</span>
+                <span class="mono">8 450 ₽</span>
+              </button>
+              <button class="qa-btn" type="button" id="qa-fullday-cabin">
+                <span>Весь день + каюта 1 000 ₽</span>
+                <span class="mono">8 200 ₽</span>
+              </button>
+              <button class="qa-btn" type="button" id="qa-birthday-promo">
+                <span>Применить скидку именинника DR300</span>
+                <span class="mono">-300 ₽/шт</span>
+              </button>
+              <button class="qa-btn" type="button" id="qa-bad-promo">
+                <span>Проверить ошибку промокода</span>
+                <span class="mono">Error state</span>
+              </button>
+              <button class="qa-btn" type="button" id="qa-empty-cart">
+                <span>Проверить пустую корзину</span>
+                <span class="mono">Empty state</span>
+              </button>
+              <button class="qa-btn" type="button" id="qa-toggle-legacy">
+                <span>Показать дефекты старой верстки</span>
+                <span class="mono">Было / Стало</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Зафиксированные дефекты текущего сайта limpopo-park.ru</h2>
+                <p class="panel-subtitle">Извлечено из HTML шаблона <span class="mono">/local/templates/main/</span> и страниц <span class="mono">/akvazona/</span>, <span class="mono">/order/</span></p>
+              </div>
+            </div>
+            <div class="audit-list">
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Блокировка масштабирования в meta viewport</div>
+                  <div class="audit-row-desc">Тег <span class="mono">user-scalable=no, maximum-scale=1.0</span> запрещает гостю увеличивать мелкие ячейки тарифов и правил посещения.</div>
+                </div>
+                <span class="status-badge badge-danger">Критично</span>
+              </div>
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Вес HTML главной страницы 583 КБ (596 742 байта)</div>
+                  <div class="audit-row-desc">Более 20 инлайн-SVG из <span class="mono">/assets/images/animation/</span> и дублирование разметки перегружают DOM до первого рендера.</div>
+                </div>
+                <span class="status-badge badge-danger">LCP 4.2 с</span>
+              </div>
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Серверная форма /order/ без sticky-чекаута</div>
+                  <div class="audit-row-desc">Отсутствует быстрый выбор Будни/Выходные и закрепленная кнопка оплаты в нижней зоне большого пальца на 360-390 px.</div>
+                </div>
+                <span class="status-badge badge-warn">Конверсия</span>
+              </div>
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Конфликт виджета JivoSite с элементами формы</div>
+                  <div class="audit-row-desc">Плавающая кнопка чата на мобильном экране перекрывает правый край таблиц и полей ввода.</div>
+                </div>
+                <span class="status-badge badge-warn">UX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BITRIX TEMPLATE MAP & CORE WEB VITALS -->
+    <section id="tab-bitrix" class="tab-panel" role="tabpanel">
+      <h2 class="section-heading">Сравнение Core Web Vitals на мобильной сети 4G (390 x 844 px)</h2>
+      <div class="cwv-grid">
+        <div class="cwv-card">
+          <div class="cwv-name">LCP (Отрисовка первого экрана)</div>
+          <div class="cwv-compare num">
+            <span class="cwv-before">4.2 с</span>
+            <span class="cwv-after">1.5 с</span>
+          </div>
+          <div class="cwv-delta num">Ускорение на 64% (цель Google &lt; 2.5 с)</div>
+        </div>
+        <div class="cwv-card">
+          <div class="cwv-name">CLS (Сдвиг макета)</div>
+          <div class="cwv-compare num">
+            <span class="cwv-before">0.24</span>
+            <span class="cwv-after">0.02</span>
+          </div>
+          <div class="cwv-delta num">Снижение на 91% за счет aspect-ratio</div>
+        </div>
+        <div class="cwv-card">
+          <div class="cwv-name">INP (Отклик интерфейса)</div>
+          <div class="cwv-compare num">
+            <span class="cwv-before">310 мс</span>
+            <span class="cwv-after">68 мс</span>
+          </div>
+          <div class="cwv-delta num">Отложенный запуск GSAP и WOW.js</div>
+        </div>
+        <div class="cwv-card">
+          <div class="cwv-name">Вес HTML главной</div>
+          <div class="cwv-compare num">
+            <span class="cwv-before">583 КБ</span>
+            <span class="cwv-after">54 КБ</span>
+          </div>
+          <div class="cwv-delta num">Вынос 20+ SVG в кешируемый спрайт</div>
+        </div>
+        <div class="cwv-card">
+          <div class="cwv-name">Стартовый JS + CSS</div>
+          <div class="cwv-compare num">
+            <span class="cwv-before">484 КБ</span>
+            <span class="cwv-after">62 КБ</span>
+          </div>
+          <div class="cwv-delta num">Lazy-загрузка Fancybox и Swiper</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Карта компонентов 1С-Битрикс и план рефакторинга</h2>
+            <p class="panel-subtitle">Перенос на изолированный шаблон <span class="mono">/local/templates/limpopo_mobile_2026/</span> с сохранением всех URL и инфоблоков</p>
+          </div>
+          <div class="seg-group" role="group" aria-label="Фильтр компонентов Битрикс">
+            <button class="seg-btn is-active" type="button" data-bx-filter="all">Все компоненты (6)</button>
+            <button class="seg-btn" type="button" data-bx-filter="critical">Критические (3)</button>
+            <button class="seg-btn" type="button" data-bx-filter="perf">Производительность (3)</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Компонент / Путь 1С-Битрикс</th>
+                <th>Текущее состояние (390 px)</th>
+                <th>Целевое решение в limpopo_mobile_2026</th>
+                <th>Эффект</th>
+                <th>Приоритет</th>
+              </tr>
+            </thead>
+            <tbody id="bx-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 class="section-heading">План безопасного внедрения без остановки продаж билетов</h2>
+      <div class="deploy-steps">
+        <div class="deploy-step">
+          <div class="deploy-step-head">
+            <span class="mono">Шаг 1</span>
+            <span class="num">0% риска</span>
+          </div>
+          <div class="deploy-step-title">Клонирование шаблона</div>
+          <div class="deploy-step-text">Создается копия <span class="mono">/local/templates/limpopo_mobile_2026/</span> рядом с рабочим <span class="mono">/local/templates/main/</span>. Боевые файлы не затрагиваются.</div>
+        </div>
+        <div class="deploy-step">
+          <div class="deploy-step-head">
+            <span class="mono">Шаг 2</span>
+            <span class="num">Тест-контур</span>
+          </div>
+          <div class="deploy-step-title">Условный роутинг в настройках</div>
+          <div class="deploy-step-text">В настройках сайта 1С-Битрикс привязывается условие по GET-параметру или поддомену <span class="mono">m.limpopo-park.ru</span> на общую БД инфоблоков.</div>
+        </div>
+        <div class="deploy-step">
+          <div class="deploy-step-head">
+            <span class="mono">Шаг 3</span>
+            <span class="num">E2E оплата</span>
+          </div>
+          <div class="deploy-step-title">Сверка /order/ и /order/b/</div>
+          <div class="deploy-step-text">Сквозная проверка оформления билетов, промокодов и фискализации с реальным шлюзом без прерывания потока основных покупателей.</div>
+        </div>
+        <div class="deploy-step">
+          <div class="deploy-step-head">
+            <span class="mono">Шаг 4</span>
+            <span class="num">Продуктив</span>
+          </div>
+          <div class="deploy-step-title">Переключение трафика</div>
+          <div class="deploy-step-text">Мягкий перевод мобильного трафика на новый адаптивный шаблон в 1 клик в административной панели 1С-Битрикс с мгновенным откатом при необходимости.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ROADMAP & FIXED ESTIMATE -->
+    <section id="tab-plan" class="tab-panel" role="tabpanel">
+      <div class="estimate-layout">
+        <div>
+          <div class="pilot-box">
+            <div class="pilot-top">
+              <div>
+                <span class="status-badge badge-warn">Этап 1: Фиксированный пилот</span>
+                <h2 class="panel-title" style="margin-top:8px;">Готовая мобильная страница «Тарифы и покупка билетов» за 48 часов</h2>
+                <p class="panel-subtitle">Развертывание на тестовом поддомене / изолированном шаблоне <span class="mono">1С-Битрикс</span> без остановки продаж</p>
+              </div>
+              <div class="pilot-price num">4 900 ₽</div>
+            </div>
+            <div class="audit-list" style="margin-top:12px;">
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Адаптивная матрица тарифов 3 часа / Весь день / Бассейн</div>
+                  <div class="audit-row-desc">Замена широких таблиц на мобильные карточки с переключением Будни / Выходные и разблокировкой zoom.</div>
+                </div>
+                <span class="status-badge badge-ok">Включено</span>
+              </div>
+              <div class="audit-row">
+                <div>
+                  <div class="audit-row-title">Липкий нижний бар покупки и мобильный stepper на /order/</div>
+                  <div class="audit-row-desc">Выбор билетов в 2 тапа на экранах 360-390 px, мгновенный пересчет промокодов и совместимость с вашей серверной формой.</div>
+                </div>
+                <span class="status-badge badge-ok">Включено</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">Этап 2: Сквозная мобильная адаптация всего сайта (конструктор тендера)</h2>
+                <p class="panel-subtitle">Отмечайте модули в пределах тендерного бюджета <span class="num">800 000 - 3 000 000 ₽</span></p>
+              </div>
+              <div class="seg-group" role="group" aria-label="Пресеты сметы">
+                <button class="seg-btn" type="button" data-scope-preset="min">Базовый (~885 тыс.)</button>
+                <button class="seg-btn is-active" type="button" data-scope-preset="optimal">Оптимальный (~1.42 млн)</button>
+                <button class="seg-btn" type="button" data-scope-preset="max">Полный (~2.18 млн)</button>
+              </div>
+            </div>
+
+            <div id="scope-modules-list"></div>
+          </div>
+        </div>
+
+        <!-- Sticky Estimate Summary -->
+        <aside class="summary-card">
+          <h2 class="panel-title">Сводка сметы для тендерной комиссии</h2>
+          <p class="panel-subtitle">Фиксированная оценка по этапам (ООО «КИТ Екатеринбург» / Mallino)</p>
+
+          <div style="margin-top:12px;">
+            <div class="summary-line">
+              <span>Этап 1 (Пилот, 48 часов)</span>
+              <strong class="num">4 900 ₽</strong>
+            </div>
+            <div class="summary-line">
+              <span>Этап 2 (Выбрано модулей: <span class="num" id="sum-mod-count">0</span>)</span>
+              <strong class="num" id="sum-stage2-price">0 ₽</strong>
+            </div>
+            <div class="summary-line">
+              <span>Срок реализации Этапа 2</span>
+              <strong class="num" id="sum-days">0 раб. дней</strong>
+            </div>
+          </div>
+
+          <div class="summary-total-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:var(--text-secondary);">Итого Этап 1 + Этап 2</span>
+              <span class="status-badge badge-ok" id="sum-budget-badge">В рамках бюджета</span>
+            </div>
+            <div class="summary-total-val num" id="sum-grand-total">0 ₽</div>
+            <div class="budget-bar-track" aria-hidden="true">
+              <div class="budget-bar-fill" id="budget-bar-fill" style="transform:scaleX(0.5);"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-top:4px;" class="num">
+              <span>800 000 ₽</span>
+              <span>Лимит 3 000 000 ₽</span>
+            </div>
+          </div>
+
+          <button class="primary-action-btn" type="button" id="copy-tz-btn">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Скопировать ТЗ-сводку для тендера</span>
+          </button>
+          <div class="copy-feedback" id="copy-feedback" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Real pricing extracted from limpopo-park.ru
+      var TARIFF_CATALOG = {
+        '3h': {
+          label: '3 часа',
+          zonesLabel: 'Аквапарк + Банный комплекс',
+          zones: ['Черная Дыра (от 1.40 м)', 'Фри Фолл', 'Водопад (от 1.40 м)', 'Оранжевая Река (от 1.30 м)', 'Анаконда (от 1.30 м)', 'Мультислайд', 'Волновой бассейн', 'Банный комплекс'],
+          items: [
+            { id: 'adult', name: 'Взрослый (от 146 см)', desc: 'Доступ ко всем горкам и баням', weekday: 2550, weekend: 2950 },
+            { id: 'child', name: 'Детский (100 - 146 см)', desc: 'Утес, Кораблик, Медленная река', weekday: 2200, weekend: 2550 },
+            { id: 'social', name: 'Льготный / Социальный', desc: 'Студенты, пенсионеры, многодетные', weekday: 1900, weekend: 2200 }
+          ]
+        },
+        'full': {
+          label: 'Весь день',
+          zonesLabel: 'Весь аквапарк 10:00 - 22:00',
+          zones: ['Все 10 горок без лимита', 'Волновой бассейн', 'Медленная река', 'Джакузи', 'Гидромассаж', 'Контрастный бассейн', 'Детский городок'],
+          items: [
+            { id: 'adult', name: 'Взрослый (от 146 см)', desc: 'Полный день без ограничения времени', weekday: 3300, weekend: 3600 },
+            { id: 'child', name: 'Детский (100 - 146 см)', desc: 'Полный день в аквазоне', weekday: 2950, weekend: 3300 },
+            { id: 'social', name: 'Льготный / Социальный', desc: 'По предъявлении документа на кассе', weekday: 2500, weekend: 2800 }
+          ]
+        },
+        'pool': {
+          label: 'Бассейн 06-23',
+          zonesLabel: 'Плавательный бассейн (/order/b/)',
+          zones: ['Дорожки 25 м', 'Режим 06:00 - 23:00', 'Утреннее плавание', 'Спортивные сеансы'],
+          items: [
+            { id: 'adult', name: 'Разовое посещение (Взрослый)', desc: 'Сеанс в плавательном бассейне', weekday: 650, weekend: 750 },
+            { id: 'child', name: 'Детское посещение', desc: 'Сопровождение или секция', weekday: 450, weekend: 550 },
+            { id: 'social', name: 'Льготный сеанс', desc: 'Утренние часы ПН - ПТ', weekday: 400, weekend: 500 }
+          ]
+        }
+      };
+
+      var BITRIX_COMPONENTS = [
+        {
+          cat: 'critical',
+          comp: 'Шаблон /local/templates/main/ (header.php, footer.php)',
+          before: 'HTML главной 583 КБ, 20+ инлайн-SVG анимаций, запрет zoom (user-scalable=no)',
+          after: 'Изолированный /local/templates/limpopo_mobile_2026/, критический CSS inline, SVG-спрайт',
+          effect: 'HTML -90%, LCP 1.5 с',
+          priority: 'Критично'
+        },
+        {
+          cat: 'critical',
+          comp: 'Билетный модуль (/order/ и /order/b/)',
+          before: 'Серверная форма без липкого чекаута, мелкие select-списки, нет быстрого калькулятора',
+          after: 'Тач-stepper 44x44 px, фильтры Будни/Вых., sticky bar и 2-tap оплата поверх action="/order/"',
+          effect: 'Рост CR оплаты',
+          priority: 'Критично'
+        },
+        {
+          cat: 'critical',
+          comp: 'bitrix:news.list (Матрица тарифов и /sale/)',
+          before: 'Жесткие широкие таблицы 640 px с горизонтальной обрезкой на экранах 360-390 px',
+          after: 'Адаптивные карточки тарифов с data-атрибутами длительности и мгновенным пересчетом',
+          effect: 'CLS 0.02, 0 overflow',
+          priority: 'Критично'
+        },
+        {
+          cat: 'perf',
+          comp: 'bitrix:catalog.section (/akvazona/, /basseyn/)',
+          before: 'Карточки горок и банного комплекса без явных размеров медиа, сдвиги при догрузке',
+          after: 'Lazy loading ниже сгиба, явный aspect-ratio карточек, быстрые фильтры роста 1.30 / 1.40 м',
+          effect: 'Стабильный скролл',
+          priority: 'Высокий'
+        },
+        {
+          cat: 'perf',
+          comp: 'Фронтенд-бандлы (Swiper 142 КБ, Fancybox 142 КБ, GSAP 71 КБ)',
+          before: 'Блокирующая загрузка всех библиотек на первом экране даже без взаимодействия',
+          after: 'CSS scroll-snap для каруселей, отложенная загрузка Fancybox и GSAP после FCP',
+          effect: 'JS -87% на старте',
+          priority: 'Высокий'
+        },
+        {
+          cat: 'perf',
+          comp: 'Внешние виджеты (JivoSite, Yandex Maps, SmartCaptcha)',
+          before: 'Jivo перекрывает край формы на 360 px, карты грузят лишние скрипты при старте',
+          after: 'Сдвиг чата выше sticky-бара или вызов из шапки, загрузка карты по IntersectionObserver',
+          effect: 'INP 68 мс',
+          priority: 'Средний'
+        }
+      ];
+
+      var STAGE2_MODULES = [
+        {
+          id: 'core',
+          title: '1. Ядро шаблона limpopo_mobile_2026 и разгрузка 583 КБ HTML',
+          desc: 'Перенос header/footer, устранение user-scalable=no, вынос 20+ SVG в спрайт, адаптивная навигация и сквозная сетка 360-1440 px.',
+          price: 380000,
+          days: 14,
+          required: true,
+          checked: true
+        },
+        {
+          id: 'tickets',
+          title: '2. Переработка билетных модулей /order/ и /order/b/ в 2 тапа',
+          desc: 'Тач-stepper, пресеты Семья/Выходные, каюты и депозиты, промокоды, sticky bottom checkout и интеграция с СБП без ломки backend Битрикса.',
+          price: 340000,
+          days: 12,
+          required: false,
+          checked: true
+        },
+        {
+          id: 'akvazona',
+          title: '3. Адаптация разделов /akvazona/, банного комплекса и бассейна',
+          desc: 'Переверстка карточек 10 горок и бассейнов, мобильный фильтр по росту ребенка (1.00 / 1.30 / 1.40 м), оптимизация фотогалерей.',
+          price: 260000,
+          days: 10,
+          required: false,
+          checked: true
+        },
+        {
+          id: 'cwv',
+          title: '4. Инженерная оптимизация Core Web Vitals и отложенные скрипты',
+          desc: 'Устранение блокирующих бандлов Swiper/Fancybox/GSAP, lazy-инициализация JivoSite и Яндекс Карт, доведение LCP < 1.8 с и CLS < 0.03.',
+          price: 210000,
+          days: 8,
+          required: false,
+          checked: true
+        },
+        {
+          id: 'promo',
+          title: '5. Разделы /sale/, дни рождения, сертификаты и групповые заявки',
+          desc: 'Адаптивные лендинги акций, калькулятор детского праздника и быстрая форма обратной связи без избыточных полей.',
+          price: 230000,
+          days: 9,
+          required: false,
+          checked: true
+        },
+        {
+          id: 'lk',
+          title: '6. Мобильный личный кабинет гостя и кошелек QR-билетов',
+          desc: 'Хранение купленных билетов в веб-кабинете с крупным QR-кодом для турникетов, история посещений и повтор покупки в 1 тап.',
+          price: 490000,
+          days: 18,
+          required: false,
+          checked: false
+        },
+        {
+          id: 'qa',
+          title: '7. Нагрузочное тестирование и матрица реальных устройств iOS/Android',
+          desc: 'Автотесты Playwright на 360/390/430 px, проверка прохождения пиковых выходных нагрузок и 30-дневная пост-релизная гарантия.',
+          price: 270000,
+          days: 7,
+          required: false,
+          checked: false
+        }
+      ];
+
+      // State
+      var state = {
+        activeTab: 'tab-sim',
+        viewport: 390,
+        simMode: 'new', // 'new' | 'legacy'
+        dayType: 'weekday', // 'weekday' | 'weekend'
+        duration: '3h', // '3h' | 'full' | 'pool'
+        counts: { adult: 2, child: 1, social: 0 },
+        cabin: 0,
+        promoType: null, // null | 'dr300' | 'pct10'
+        payMethod: 'sbp',
+        bxFilter: 'all',
+        modules: STAGE2_MODULES.map(function (m) { return Object.assign({}, m); })
+      };
+
+      function formatRub(val) {
+        return Math.round(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₽';
+      }
+
+      // Main Tabs Switching
+      var tabBtns = document.querySelectorAll('.tab-btn');
+      var tabPanels = document.querySelectorAll('.tab-panel');
+      tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var target = btn.getAttribute('data-tab');
+          state.activeTab = target;
+          tabBtns.forEach(function (b) {
+            var active = b === btn;
+            b.classList.toggle('is-active', active);
+            b.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+          tabPanels.forEach(function (p) {
+            p.classList.toggle('is-active', p.id === target);
+          });
+        });
+      });
+
+      // Simulator Size & Mode Controls
+      var chassis = document.getElementById('device-chassis');
+      var resLabel = document.getElementById('device-res-label');
+      var telViewportTxt = document.getElementById('tel-viewport-txt');
+      var sizeBtns = document.querySelectorAll('[data-size]');
+      sizeBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.viewport = Number(btn.getAttribute('data-size'));
+          sizeBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          chassis.classList.toggle('size-360', state.viewport === 360);
+          chassis.classList.toggle('size-390', state.viewport === 390);
+          var txt = state.viewport === 360 ? '360 x 800 px' : '390 x 844 px';
+          resLabel.textContent = 'Viewport: ' + txt;
+          telViewportTxt.textContent = txt;
+          updateTelemetry();
+        });
+      });
+
+      var modeBtns = document.querySelectorAll('[data-mode]');
+      var mobViewNew = document.getElementById('mob-view-new');
+      var mobViewLegacy = document.getElementById('mob-view-legacy');
+      var stickyBar = document.getElementById('mob-sticky-bar');
+      var legacyJivo = document.getElementById('legacy-jivo-float');
+      var deviceViewport = document.getElementById('device-viewport');
+      var deviceUrlBox = document.getElementById('device-url-box');
+      var zoomBadge = document.getElementById('device-zoom-badge');
+      var simStatusBadge = document.getElementById('sim-status-badge');
+
+      function setSimMode(mode) {
+        state.simMode = mode;
+        sheetBackdrop.classList.remove('is-open');
+        modeBtns.forEach(function (b) {
+          var m = b.getAttribute('data-mode');
+          b.classList.remove('is-active-water', 'is-active-danger');
+          if (m === mode) {
+            b.classList.add(mode === 'new' ? 'is-active-water' : 'is-active-danger');
+          }
+        });
+        var isNew = mode === 'new';
+        mobViewNew.classList.toggle('is-active', isNew);
+        mobViewLegacy.classList.toggle('is-active', !isNew);
+        stickyBar.style.display = isNew ? 'flex' : 'none';
+        legacyJivo.style.display = isNew ? 'none' : 'block';
+        deviceViewport.classList.toggle('has-overflow-bug', !isNew);
+        deviceUrlBox.textContent = isNew
+          ? 'limpopo-park.ru/order/?template=limpopo_mobile_2026'
+          : 'limpopo-park.ru/order/ (main template)';
+        zoomBadge.textContent = isNew ? 'Zoom OK' : 'Zoom Blocked';
+        zoomBadge.className = 'status-badge ' + (isNew ? 'badge-ok' : 'badge-danger');
+        simStatusBadge.textContent = isNew
+          ? 'Режим: Новая верстка 2-tap checkout'
+          : 'Режим: Дефекты текущего 1С-Битрикс';
+        simStatusBadge.className = 'status-badge ' + (isNew ? 'badge-info' : 'badge-danger');
+        updateTelemetry();
+      }
+
+      modeBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          setSimMode(btn.getAttribute('data-mode'));
+        });
+      });
+
+      function updateTelemetry() {
+        var isNew = state.simMode === 'new';
+        var telModeBadge = document.getElementById('tel-mode-badge');
+        var telTaps = document.getElementById('tel-taps');
+        var telTapsSub = document.getElementById('tel-taps-sub');
+        var telScroll = document.getElementById('tel-scroll');
+        var telScrollSub = document.getElementById('tel-scroll-sub');
+        var telOverflow = document.getElementById('tel-overflow');
+        var telOverflowSub = document.getElementById('tel-overflow-sub');
+        var telTouch = document.getElementById('tel-touch');
+        var telTouchSub = document.getElementById('tel-touch-sub');
+        var scrollLabel = document.getElementById('device-scroll-label');
+
+        if (isNew) {
+          telModeBadge.textContent = 'Оптимизированный шаблон';
+          telModeBadge.className = 'status-badge badge-ok';
+          telTaps.textContent = '2 тапа';
+          telTaps.className = 'kpi-val num is-ok';
+          telTapsSub.textContent = 'Выбор тарифа + кнопка sticky bar';
+          telScroll.textContent = '168 px';
+          telScroll.className = 'kpi-val num is-ok';
+          telScrollSub.textContent = 'Цены видны сразу на первом экране';
+          telOverflow.textContent = '0 px';
+          telOverflow.className = 'kpi-val num is-ok';
+          telOverflowSub.textContent = 'Строгая адаптивная сетка под ' + state.viewport + ' px';
+          telTouch.textContent = '44 x 44 px';
+          telTouch.className = 'kpi-val num is-ok';
+          telTouchSub.textContent = 'Соответствует WCAG / iOS HIG';
+          scrollLabel.textContent = 'Тач-таргеты: min 44 x 44 px';
+        } else {
+          var ov = 640 - state.viewport;
+          telModeBadge.textContent = 'Обнаружены узкие места';
+          telModeBadge.className = 'status-badge badge-danger';
+          telTaps.textContent = '7+ тапов';
+          telTaps.className = 'kpi-val num is-bad';
+          telTapsSub.textContent = 'Раскрытие select-списков и прокрутка';
+          telScroll.textContent = '820 px';
+          telScroll.className = 'kpi-val num is-bad';
+          telScrollSub.textContent = 'Тяжелый блок SVG-анимаций выше цен';
+          telOverflow.textContent = '+' + ov + ' px';
+          telOverflow.className = 'kpi-val num is-bad';
+          telOverflowSub.textContent = 'Таблица прайса 640 px рвет экран ' + state.viewport + ' px';
+          telTouch.textContent = '24 x 24 px';
+          telTouch.className = 'kpi-val num is-bad';
+          telTouchSub.textContent = 'Мелкие контролы без отступов';
+          scrollLabel.textContent = 'Overflow: +' + ov + ' px горизонтально';
+        }
+      }
+
+      // Render Tickets inside Phone
+      function computeTotals() {
+        var cat = TARIFF_CATALOG[state.duration];
+        var ticketCount = 0;
+        var ticketsBase = 0;
+        cat.items.forEach(function (item) {
+          var qty = state.counts[item.id] || 0;
+          var unit = state.dayType === 'weekday' ? item.weekday : item.weekend;
+          ticketCount += qty;
+          ticketsBase += qty * unit;
+        });
+
+        var discount = 0;
+        if (state.promoType === 'dr300' && ticketCount > 0) {
+          discount = ticketCount * 300;
+        } else if (state.promoType === 'pct10' && ticketsBase > 0) {
+          discount = Math.round(ticketsBase * 0.10);
+        }
+        if (discount > ticketsBase) discount = ticketsBase;
+
+        var total = Math.max(0, ticketsBase - discount + (ticketCount > 0 ? state.cabin : 0));
+        return { ticketCount: ticketCount, ticketsBase: ticketsBase, discount: discount, total: total };
+      }
+
+      function renderPhoneTickets() {
+        var cat = TARIFF_CATALOG[state.duration];
+        var listEl = document.getElementById('mob-ticket-list');
+        var emptyEl = document.getElementById('mob-empty-state');
+        listEl.innerHTML = '';
+
+        cat.items.forEach(function (item) {
+          var qty = state.counts[item.id] || 0;
+          var unit = state.dayType === 'weekday' ? item.weekday : item.weekend;
+
+          var card = document.createElement('div');
+          card.className = 'mob-ticket-card' + (qty > 0 ? ' is-selected' : '');
+
+          var info = document.createElement('div');
+          info.className = 'mob-ticket-info';
+          info.innerHTML =
+            '<div class="mob-ticket-name">' + item.name + '</div>' +
+            '<div class="mob-ticket-desc">' + item.desc + '</div>' +
+            '<div class="mob-ticket-price num">' + formatRub(unit) + '</div>';
+
+          var stepper = document.createElement('div');
+          stepper.className = 'stepper';
+
+          var minusBtn = document.createElement('button');
+          minusBtn.type = 'button';
+          minusBtn.className = 'stepper-btn';
+          minusBtn.textContent = '-';
+          minusBtn.disabled = qty === 0;
+          minusBtn.setAttribute('aria-label', 'Уменьшить: ' + item.name);
+          minusBtn.addEventListener('click', function () {
+            if (state.counts[item.id] > 0) {
+              state.counts[item.id] -= 1;
+              renderPhoneTickets();
+            }
+          });
+
+          var valSpan = document.createElement('span');
+          valSpan.className = 'stepper-val num';
+          valSpan.textContent = String(qty);
+
+          var plusBtn = document.createElement('button');
+          plusBtn.type = 'button';
+          plusBtn.className = 'stepper-btn is-plus';
+          plusBtn.textContent = '+';
+          plusBtn.setAttribute('aria-label', 'Добавить: ' + item.name);
+          plusBtn.addEventListener('click', function () {
+            state.counts[item.id] = (state.counts[item.id] || 0) + 1;
+            renderPhoneTickets();
+          });
+
+          stepper.appendChild(minusBtn);
+          stepper.appendChild(valSpan);
+          stepper.appendChild(plusBtn);
+          card.appendChild(info);
+          card.appendChild(stepper);
+          listEl.appendChild(card);
+        });
+
+        // Zones tags
+        document.getElementById('mob-zone-label').textContent = cat.zonesLabel;
+        var zTags = document.getElementById('mob-zones-tags');
+        zTags.innerHTML = '';
+        cat.zones.forEach(function (z) {
+          var s = document.createElement('span');
+          s.className = 'mob-zone-tag';
+          s.textContent = z;
+          zTags.appendChild(s);
+        });
+
+        // Sticky bar & empty state
+        var totals = computeTotals();
+        emptyEl.style.display = totals.ticketCount === 0 ? 'block' : 'none';
+
+        var dayLabel = state.dayType === 'weekday' ? 'Будни' : 'Выходные';
+        var word = totals.ticketCount === 1 ? 'билет' : (totals.ticketCount >= 2 && totals.ticketCount <= 4 ? 'билета' : 'билетов');
+        var discText = totals.discount > 0 ? ' | Скидка -' + formatRub(totals.discount) : '';
+        document.getElementById('mob-sticky-count').textContent =
+          totals.ticketCount + ' ' + word + ' | ' + dayLabel + ', ' + cat.label + discText;
+        document.getElementById('mob-sticky-total').textContent = formatRub(totals.total);
+        document.getElementById('mob-open-checkout').disabled = totals.ticketCount === 0;
+      }
+
+      // Day & Duration Controls inside Phone
+      var dayBtns = document.querySelectorAll('[data-day]');
+      dayBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.dayType = btn.getAttribute('data-day');
+          dayBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          renderPhoneTickets();
+        });
+      });
+
+      var durBtns = document.querySelectorAll('[data-duration]');
+      durBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.duration = btn.getAttribute('data-duration');
+          durBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          renderPhoneTickets();
+        });
+      });
+
+      var cabinBtns = document.querySelectorAll('[data-cabin]');
+      cabinBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.cabin = Number(btn.getAttribute('data-cabin'));
+          cabinBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          renderPhoneTickets();
+        });
+      });
+
+      // Presets inside Phone
+      function applyPreset(preset) {
+        if (preset === 'family') {
+          state.counts = { adult: 2, child: 1, social: 0 };
+        } else if (preset === 'couple') {
+          state.counts = { adult: 2, child: 0, social: 0 };
+        } else if (preset === 'birthday') {
+          state.counts = { adult: 2, child: 1, social: 0 };
+          applyPromoCode('DR300');
+        } else if (preset === 'clear') {
+          state.counts = { adult: 0, child: 0, social: 0 };
+          state.cabin = 0;
+          cabinBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-cabin') === '0'); });
+        }
+        renderPhoneTickets();
+      }
+
+      document.querySelectorAll('[data-preset]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          applyPreset(btn.getAttribute('data-preset'));
+        });
+      });
+
+      document.getElementById('mob-empty-preset-btn').addEventListener('click', function () {
+        applyPreset('family');
+      });
+
+      // Promo Validation
+      var promoInput = document.getElementById('mob-promo-input');
+      var promoMsg = document.getElementById('mob-promo-msg');
+      function applyPromoCode(raw) {
+        var code = (raw || '').trim().toUpperCase();
+        promoInput.value = code;
+        if (!code) {
+          state.promoType = null;
+          promoMsg.className = 'mob-promo-msg';
+          promoMsg.textContent = 'Доступные коды: DR300 (-300 ₽/билет), LIMPOPO10 (-10%)';
+        } else if (code === 'DR300') {
+          state.promoType = 'dr300';
+          promoMsg.className = 'mob-promo-msg is-ok';
+          promoMsg.textContent = 'Применена скидка именинника: -300 ₽ за каждый билет';
+        } else if (code === 'LIMPOPO10') {
+          state.promoType = 'pct10';
+          promoMsg.className = 'mob-promo-msg is-ok';
+          promoMsg.textContent = 'Применен промокод LIMPOPO10: скидка 10% на билеты';
+        } else {
+          state.promoType = null;
+          promoMsg.className = 'mob-promo-msg is-err';
+          promoMsg.textContent = 'Код «' + code + '» не найден. Используйте DR300 или LIMPOPO10';
+        }
+        renderPhoneTickets();
+      }
+
+      document.getElementById('mob-promo-btn').addEventListener('click', function () {
+        applyPromoCode(promoInput.value);
+      });
+
+      // Checkout Bottom Sheet
+      var sheetBackdrop = document.getElementById('mob-sheet-backdrop');
+      var sheetFormBody = document.getElementById('mob-sheet-form-body');
+      var sheetReceipt = document.getElementById('mob-sheet-receipt');
+      var confirmPayBtn = document.getElementById('mob-confirm-pay');
+
+      document.getElementById('mob-open-checkout').addEventListener('click', function () {
+        var totals = computeTotals();
+        var cat = TARIFF_CATALOG[state.duration];
+        var dayLabel = state.dayType === 'weekday' ? 'Будни' : 'Выходные';
+        document.getElementById('mob-sheet-summary').textContent =
+          cat.label + ', ' + dayLabel + ' | Билетов: ' + totals.ticketCount + ' | К оплате: ' + formatRub(totals.total);
+        sheetFormBody.style.display = 'block';
+        sheetReceipt.style.display = 'none';
+        confirmPayBtn.disabled = false;
+        confirmPayBtn.textContent = 'Оплатить ' + formatRub(totals.total);
+        sheetBackdrop.classList.add('is-open');
+      });
+
+      document.getElementById('mob-close-sheet').addEventListener('click', function () {
+        sheetBackdrop.classList.remove('is-open');
+      });
+
+      sheetBackdrop.addEventListener('click', function (e) {
+        if (e.target === sheetBackdrop) {
+          sheetBackdrop.classList.remove('is-open');
+        }
+      });
+
+      document.querySelectorAll('[data-pay]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.payMethod = btn.getAttribute('data-pay');
+          document.querySelectorAll('[data-pay]').forEach(function (b) {
+            b.classList.toggle('is-active', b === btn);
+          });
+        });
+      });
+
+      confirmPayBtn.addEventListener('click', function () {
+        var email = document.getElementById('mob-email-input').value.trim();
+        if (!email || email.indexOf('@') === -1) {
+          document.getElementById('mob-email-input').focus();
+          return;
+        }
+        confirmPayBtn.disabled = true;
+        confirmPayBtn.textContent = 'Обработка платежа...';
+        var totals = computeTotals();
+        // Rule >= 300ms for loading state
+        setTimeout(function () {
+          sheetFormBody.style.display = 'none';
+          sheetReceipt.style.display = 'block';
+          var payNames = { sbp: 'СБП QR', mir: 'Карта Мир', sber: 'SberPay' };
+          document.getElementById('mob-receipt-details').textContent =
+            'Заказ #LP-2026-4819 на сумму ' + formatRub(totals.total) + ' (' + payNames[state.payMethod] + '). QR-билеты отправлены на ' + email + '.';
+        }, 350);
+      });
+
+      // Right Inspector Quick QA Buttons
+      document.getElementById('qa-family-weekend').addEventListener('click', function () {
+        setSimMode('new');
+        state.dayType = 'weekend';
+        state.duration = '3h';
+        state.cabin = 0;
+        dayBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-day') === 'weekend'); });
+        durBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-duration') === '3h'); });
+        cabinBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-cabin') === '0'); });
+        applyPromoCode('');
+        applyPreset('family');
+      });
+
+      document.getElementById('qa-fullday-cabin').addEventListener('click', function () {
+        setSimMode('new');
+        state.dayType = 'weekend';
+        state.duration = 'full';
+        state.cabin = 1000;
+        dayBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-day') === 'weekend'); });
+        durBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-duration') === 'full'); });
+        cabinBtns.forEach(function (b) { b.classList.toggle('is-active', b.getAttribute('data-cabin') === '1000'); });
+        state.counts = { adult: 2, child: 0, social: 0 };
+        renderPhoneTickets();
+      });
+
+      document.getElementById('qa-birthday-promo').addEventListener('click', function () {
+        setSimMode('new');
+        if (computeTotals().ticketCount === 0) applyPreset('family');
+        applyPromoCode('DR300');
+      });
+
+      document.getElementById('qa-bad-promo').addEventListener('click', function () {
+        setSimMode('new');
+        applyPromoCode('TEST999');
+      });
+
+      document.getElementById('qa-empty-cart').addEventListener('click', function () {
+        setSimMode('new');
+        applyPreset('clear');
+      });
+
+      document.getElementById('qa-toggle-legacy').addEventListener('click', function () {
+        setSimMode(state.simMode === 'new' ? 'legacy' : 'new');
+      });
+
+      // TAB 2: Bitrix Table Render & Filter
+      function renderBitrixTable() {
+        var tbody = document.getElementById('bx-table-body');
+        tbody.innerHTML = '';
+        BITRIX_COMPONENTS.forEach(function (row) {
+          if (state.bxFilter !== 'all' && row.cat !== state.bxFilter) return;
+          var tr = document.createElement('tr');
+          var badgeCls = row.priority === 'Критично' ? 'badge-danger' : (row.priority === 'Высокий' ? 'badge-warn' : 'badge-info');
+          tr.innerHTML =
+            '<td class="mono" style="font-size:12px;">' + row.comp + '</td>' +
+            '<td>' + row.before + '</td>' +
+            '<td>' + row.after + '</td>' +
+            '<td class="num" style="font-weight:600;color:var(--status-ok);">' + row.effect + '</td>' +
+            '<td><span class="status-badge ' + badgeCls + '">' + row.priority + '</span></td>';
+          tbody.appendChild(tr);
+        });
+      }
+
+      var bxFilterBtns = document.querySelectorAll('[data-bx-filter]');
+      bxFilterBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state.bxFilter = btn.getAttribute('data-bx-filter');
+          bxFilterBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          renderBitrixTable();
+        });
+      });
+
+      // TAB 3: Scope & Estimate Configurator
+      function renderEstimate() {
+        var listEl = document.getElementById('scope-modules-list');
+        listEl.innerHTML = '';
+        var stage2Total = 0;
+        var totalDays = 0;
+        var selectedCount = 0;
+
+        state.modules.forEach(function (mod) {
+          if (mod.checked) {
+            stage2Total += mod.price;
+            totalDays += mod.days;
+            selectedCount += 1;
+          }
+
+          var row = document.createElement('label');
+          row.className = 'module-row' + (mod.checked ? ' is-checked' : '');
+
+          var left = document.createElement('div');
+          left.className = 'module-left';
+
+          var cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.id = 'mod-cb-' + mod.id;
+          cb.name = 'mod_' + mod.id;
+          cb.className = 'module-checkbox';
+          cb.checked = mod.checked;
+          cb.disabled = mod.required;
+          cb.addEventListener('change', function () {
+            mod.checked = cb.checked;
+            renderEstimate();
+          });
+
+          var info = document.createElement('div');
+          info.innerHTML =
+            '<div class="module-title">' + mod.title + (mod.required ? ' <span class="status-badge badge-info">База</span>' : '') + '</div>' +
+            '<div class="module-desc">' + mod.desc + '</div>';
+
+          left.appendChild(cb);
+          left.appendChild(info);
+
+          var cost = document.createElement('div');
+          cost.className = 'module-cost';
+          cost.innerHTML =
+            '<div class="module-cost-val num">' + formatRub(mod.price) + '</div>' +
+            '<div class="module-cost-days num">' + mod.days + ' раб. дней</div>';
+
+          row.appendChild(left);
+          row.appendChild(cost);
+          listEl.appendChild(row);
+        });
+
+        var grandTotal = 4900 + stage2Total;
+        document.getElementById('sum-mod-count').textContent = String(selectedCount);
+        document.getElementById('sum-stage2-price').textContent = formatRub(stage2Total);
+        document.getElementById('sum-days').textContent = totalDays + ' раб. дней';
+        document.getElementById('sum-grand-total').textContent = formatRub(grandTotal);
+
+        var ratio = Math.min(1, Math.max(0.05, grandTotal / 3000000));
+        document.getElementById('budget-bar-fill').style.transform = 'scaleX(' + ratio.toFixed(3) + ')';
+
+        var badge = document.getElementById('sum-budget-badge');
+        if (grandTotal >= 800000 && grandTotal <= 3000000) {
+          badge.textContent = 'В рамках бюджета';
+          badge.className = 'status-badge badge-ok';
+        } else if (grandTotal < 800000) {
+          badge.textContent = 'Ниже 800 000 ₽';
+          badge.className = 'status-badge badge-info';
+        } else {
+          badge.textContent = 'Выше 3 000 000 ₽';
+          badge.className = 'status-badge badge-warn';
+        }
+      }
+
+      var scopePresetBtns = document.querySelectorAll('[data-scope-preset]');
+      scopePresetBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var preset = btn.getAttribute('data-scope-preset');
+          scopePresetBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+          state.modules.forEach(function (mod) {
+            if (mod.required) {
+              mod.checked = true;
+            } else if (preset === 'min') {
+              mod.checked = (mod.id === 'tickets' || mod.id === 'cwv');
+            } else if (preset === 'optimal') {
+              mod.checked = (mod.id !== 'lk' && mod.id !== 'qa');
+            } else {
+              mod.checked = true;
+            }
+          });
+          renderEstimate();
+        });
+      });
+
+      document.getElementById('copy-tz-btn').addEventListener('click', function () {
+        var selected = state.modules.filter(function (m) { return m.checked; });
+        var stage2 = selected.reduce(function (s, m) { return s + m.price; }, 0);
+        var days = selected.reduce(function (s, m) { return s + m.days; }, 0);
+        var lines = [
+          'ТЗ-сводка: Мобильная адаптация limpopo-park.ru (1С-Битрикс)',
+          'Этап 1 (Пилот, 48 часов): 4 900 ₽ - страница тарифов и покупки билетов на /local/templates/limpopo_mobile_2026/',
+          'Этап 2 (' + selected.length + ' модулей, ' + days + ' раб. дней): ' + formatRub(stage2),
+          'Итого: ' + formatRub(4900 + stage2),
+          '',
+          'Выбранные модули:'
+        ].concat(selected.map(function (m) { return '- ' + m.title + ' (' + formatRub(m.price) + ')'; }));
+
+        var text = lines.join('\n');
+        var fb = document.getElementById('copy-feedback');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            fb.textContent = 'ТЗ-сводка скопирована в буфер обмена';
+          }, function () {
+            fb.textContent = 'Сводка сформирована (' + selected.length + ' модулей, ' + formatRub(4900 + stage2) + ')';
+          });
+        } else {
+          fb.textContent = 'Сводка сформирована (' + selected.length + ' модулей, ' + formatRub(4900 + stage2) + ')';
+        }
+      });
+
+      // Initial renders
+      renderPhoneTickets();
+      renderBitrixTable();
+      renderEstimate();
+      updateTelemetry();
+    })();
+  </script>
+</body>
+</html>
